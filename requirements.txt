@@ -1,4 +1,5 @@
 opencv-python
 mediapipe
-numpy
+numpy<2.0.0
 pyautogui
+pydantic-settings>=2.10.1

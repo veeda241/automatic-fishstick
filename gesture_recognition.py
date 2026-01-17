@@ -16,7 +16,9 @@ class GestureRecognizer:
         }
         self.smoothened_x, self.smoothened_y = 0, 0
         self.smooth_factor = 7
-        self.base_click_threshold = 30 
+        self.base_click_threshold = 30
+        self.right_click_threshold = 35 # Distance between Index and Middle tips
+        self.kb_mode = False
         
     def get_gesture(self, landmarks):
         if not landmarks:
@@ -73,11 +75,17 @@ class GestureRecognizer:
         dynamic_threshold = self.base_click_threshold * (self.analytics["hand_scale"] / 80.0)
         dynamic_threshold = max(20, min(50, dynamic_threshold))
 
+        # Right Click Detection (Index + Middle tips close)
+        middle_tip = np.array([landmarks[12][1], landmarks[12][2]])
+        im_dist = np.linalg.norm(index_tip - middle_tip)
+        
         # Gesture Logic
         if extended_count == 0:
             return "Fist"
         elif pinch_dist < dynamic_threshold:
             return "Pinch"
+        elif im_dist < self.right_click_threshold and extended_count >= 2:
+            return "Two-Finger" # Right Click
         elif extended_count >= 4:
             return "Open Palm"
             

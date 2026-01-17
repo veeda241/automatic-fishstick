@@ -1,25 +1,25 @@
-# HCI Desktop Interface & Analytics v3.2 👁️✋
+# HCI Desktop Interface & Analytics v3.3 👁️✋
 
-A professional Computer Vision research project bridging the gap between raw video streams and Human-Computer Interaction (HCI). This system implements an optimized, high-feedback workstation interface for touchless system control.
+A professional Computer Vision research project bridging the gap between raw video streams and Human-Computer Interaction (HCI). Version 3.3 introduces **Multi-Finger Interaction** and an **AR Virtual Keyboard**.
 
 ## 🚀 System Capabilities
 
-### 1. High-Precision Cursor Mapping
-- **Hardware-Level Control**: Uses PyAutoGUI to map hand landmarks directly to the OS cursor.
-- **Damping & Smoothing**: Implements a temporal averaging filter to ensure precise interaction without jitter.
-- **Dynamic Mapping**: Automatically scales camera coordinates to the local monitor resolution.
-
-### 2. Multi-Dimensional Gesture Suite
-- **Input Triggering**: Real-time "Pinch" detection for system clicks (Distance Analytics).
+### 1. Multi-Dimensional Gesture Suite
+- **Primary Input**: Pinch (Thumb + Index) for Left Click or Key Press.
+- **Secondary Input**: **Two-Finger (Index + Middle tips)** for Right Click.
 - **Workflow Automation**:
     - **Horizontal Swipe**: Switches between Virtual Desktops (`Ctrl + Win + Left/Right`).
     - **Vertical Swipe**: Toggles active windows via `Alt + Tab`.
-- **State Architecture**: Formalized states for Tracking, Interaction, and Locked (Grab) modes.
+
+### 2. AR Virtual Keyboard
+- **Interactive Layout**: Standard QWERTY layout rendered in AR.
+- **Precision Targeting**: Hover over keys to highlight them; Pinch to input the character.
+- **Toggle Mode**: Use the 'K' key to enable/disable the AR keyboard overlay.
 
 ### 3. Industrial Interaction HUD
-- **3D Visualization**: Real-time projection of 3D wireframe geometry mapped to spatial hand coordinates.
-- **Minimalist Design**: A workstation-style silver and charcoal interface optimized for professional utility.
-- **Face Mesh Integration**: 468-point high-density facial analysis for gaze-aware system response prototypes.
+- **Real-time 3D**: Wireframe projection mapped to spatial hand coordinates.
+- **Pulse Feedback**: Dynamic UI glow that responds to gesture detection.
+- **Face Mesh Integration**: 468-point analysis for gaze-aware prototype development.
 
 ## 🕹️ Control Manual
 
@@ -27,35 +27,23 @@ A professional Computer Vision research project bridging the gap between raw vid
 | :--- | :--- | :--- |
 | **Move Cursor** | Index Finger Tip Pointing | Mouse Movement |
 | **Left Click** | Thumb + Index Pinch | Mouse Click |
-| **Shift Desktop** | Fast Horizontal Swipe (L/R) | Ctrl + Win + Arrow |
-| **Switch Window** | Fast Vertical Swipe (U/D) | Alt + Tab |
+| **Right Click** | Index + Middle Tips Close | Mouse Right Click |
+| **Type Key** | Hover over AR key + Pinch | Keyboard Input |
+| **Shift Desktop** | Fast Horizontal Swipe | Ctrl + Win + Arrow |
+| **Switch Window** | Fast Vertical Swipe | Alt + Tab |
 | **Grab 3D Model** | Closed Fist | Model Lock State |
 
 ## 🛠️ Tech Stack
 - **Python**: Core logic.
-- **OpenCV**: Image signal processing.
+- **OpenCV**: Image processing.
 - **MediaPipe**: AI landmark extraction.
-- **PyAutoGUI**: OS-level hardware interaction.
-- **NumPy**: Matrix transformations and 3D projection.
+- **PyAutoGUI**: Hardware interaction.
+- **NumPy**: Matrix transformations.
 
 ## 📦 Run Instructions
-
-1. **Install requirements**:
-   ```bash
-   pip install opencv-python mediapipe numpy pyautogui
-   ```
-2. **Launch interface**:
-   ```bash
-   python main.py
-   ```
-
-## 📂 Project Structure
-- `main.py`: The orchestrator and AR loop.
-- `ARCHITECTURE.md`: Detailed system design and data flow.
-- `hand_tracking.py`: MediaPipe Hand Landmark implementation.
-- `face_tracking.py`: 468-Point Face Mesh implementation.
-- `gesture_recognition.py`: Euclidean distance analytics and logic.
-- `hud_renderer.py`: Industrial-grade AR graphics engine.
+1. Install requirements: `pip install opencv-python mediapipe numpy pyautogui`
+2. Launch: `python main.py`
+3. Toggle Keyboard: Press **'K'** during execution.
 
 ---
 *Developed for HCI Research, Industrial Automation, and Next-Gen Interface Prototyping.*
