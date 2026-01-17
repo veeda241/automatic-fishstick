@@ -1,6 +1,6 @@
-# HCI Desktop Interface & Analytics 👁️✋
+# HCI Desktop Interface & Analytics v3.2 👁️✋
 
-A professional Computer Vision research project bridging the gap between raw video streams and Human-Computer Interaction (HCI). This system implements a workstation-grade interface for touchless system control, 3D object manipulation, and OS-level workflow automation.
+A professional Computer Vision research project bridging the gap between raw video streams and Human-Computer Interaction (HCI). This system implements an optimized, high-feedback workstation interface for touchless system control.
 
 ## 🚀 System Capabilities
 

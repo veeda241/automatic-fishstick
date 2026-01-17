@@ -6,7 +6,7 @@ class GestureRecognizer:
         self.fist_threshold = 50
         self.prev_center_x = None
         self.prev_center_y = None
-        self.swipe_threshold = 40
+        self.swipe_threshold = 15 # Lowered for per-frame detection
         self.swipe_cooldown = 0
         self.analytics = {
             "pinch_dist": 0,
@@ -16,7 +16,7 @@ class GestureRecognizer:
         }
         self.smoothened_x, self.smoothened_y = 0, 0
         self.smooth_factor = 7
-        self.click_threshold = 25 # Distance in pixels to trigger click
+        self.base_click_threshold = 30 
         
     def get_gesture(self, landmarks):
         if not landmarks:
@@ -68,10 +68,15 @@ class GestureRecognizer:
             if landmarks[tip][2] < landmarks[pip][2]: # Tip is above PIP joint
                 extended_count += 1
                 
+        # Dynamic click threshold based on hand scale (distance from wrist to index MCP)
+        # Larger hand scale = closer to camera = larger threshold
+        dynamic_threshold = self.base_click_threshold * (self.analytics["hand_scale"] / 80.0)
+        dynamic_threshold = max(20, min(50, dynamic_threshold))
+
         # Gesture Logic
         if extended_count == 0:
             return "Fist"
-        elif pinch_dist < self.click_threshold:
+        elif pinch_dist < dynamic_threshold:
             return "Pinch"
         elif extended_count >= 4:
             return "Open Palm"

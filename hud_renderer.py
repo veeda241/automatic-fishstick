@@ -35,19 +35,29 @@ class HUDRenderer:
         h, w, c = img.shape
         t = time.time()
         
-        # 1. Workspace Control Panel (Professional Minimalist)
-        cv2.rectangle(overlay, (20, 20), (320, 200), self.bg_panel_color, -1)
-        cv2.rectangle(overlay, (20, 20), (320, 200), self.primary_color, 1) # Border
+        # Glow color based on state
+        glow_color = self.primary_color
+        if gesture == "Pinch": glow_color = self.accent_color
+        if gesture == "Fist": glow_color = (0, 0, 255)
         
-        cv2.putText(overlay, "HCI CONTROL INTERFACE", (35, 50), self.font, 0.6, self.primary_color, 1)
-        cv2.line(overlay, (35, 60), (300, 60), self.primary_color, 1)
+        # 1. Main Dashboard (Semi-transparent)
+        cv2.rectangle(overlay, (20, 20), (350, 220), self.bg_panel_color, -1)
+        cv2.rectangle(overlay, (20, 20), (350, 220), glow_color, 2)
         
-        status_color = self.accent_color if landmarks else (0, 0, 255)
-        cv2.circle(overlay, (40, 85), 5, status_color, -1)
-        cv2.putText(overlay, f"TRACKING: {'LINKED' if landmarks else 'SEARCHING'}", (55, 90), self.font, 0.5, (200, 200, 200), 1)
-        cv2.putText(overlay, f"ACTION: {gesture.upper()}", (35, 120), self.font, 0.5, self.secondary_color, 1)
+        cv2.putText(overlay, "HCI INTERFACE v3.2", (40, 55), self.font, 0.7, glow_color, 2)
+        cv2.line(overlay, (30, 65), (340, 65), glow_color, 1)
+        
+        # Tracking Status with "Pulse"
+        pulse = int(abs(np.sin(t * 3)) * 100 + 155)
+        status_color = (0, pulse, 0) if landmarks else (0, 0, pulse)
+        cv2.circle(overlay, (45, 95), 8, status_color, -1)
+        cv2.putText(overlay, f"SENSORS: {'ONLINE' if landmarks else 'SEARCHING'}", (65, 102), self.font, 0.5, (220, 220, 220), 1)
+        
+        # Active Gesture with dynamic highlight
+        gesture_text = f"GESTURE: {gesture.upper()}"
+        cv2.putText(overlay, gesture_text, (40, 140), self.font, 0.6, glow_color, 2)
 
-        # 2. 3D Model Interaction (Industrial Design Style)
+        # 2. 3D Wireframe (Improved contrast and scale)
         cube_points = np.array([
             [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1],
             [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1]
@@ -55,50 +65,45 @@ class HUDRenderer:
         
         if landmarks:
             cube_center = (landmarks[9][1], landmarks[9][2])
-            cube_scale = 400 + (analytics['pinch_dist'] * 2 if analytics else 0)
+            cube_scale = 500 + (analytics['pinch_dist'] * 3 if analytics else 0)
         else:
-            cube_center = (w - 150, h - 150)
-            cube_scale = 300
+            cube_center = (w - 180, h - 180)
+            cube_scale = 350
             
-        proj = self._project_3d(cube_points, t*0.3, t*0.5, cube_center, cube_scale)
+        proj = self._project_3d(cube_points, t*0.4, t*0.2, cube_center, cube_scale)
         
-        # Draw 3D Object
-        color_3d = self.secondary_color if gesture != "Fist" else (0, 0, 255)
-        thickness = 2 if gesture == "Fist" else 1
         for i in range(4):
-            cv2.line(overlay, proj[i], proj[(i+1)%4], color_3d, thickness)
-            cv2.line(overlay, proj[i+4], proj[((i+1)%4)+4], color_3d, thickness)
-            cv2.line(overlay, proj[i], proj[i+4], color_3d, thickness)
+            cv2.line(overlay, proj[i], proj[(i+1)%4], glow_color, 1)
+            cv2.line(overlay, proj[i+4], proj[((i+1)%4)+4], glow_color, 1)
+            cv2.line(overlay, proj[i], proj[i+4], glow_color, 1)
 
-        # 3. Analytics Dashboard
+        # 3. Analytics Dashboard (Responsive bars)
         if analytics:
-            cv2.putText(overlay, "SIGNAL ANALYTICS", (35, 150), self.font, 0.4, (150, 150, 150), 1)
             p_dist = analytics.get('pinch_dist', 100)
-            # Distance Gauge
-            cv2.rectangle(overlay, (35, 165), (135, 175), (60, 60, 60), -1)
-            bar_w = int(np.interp(p_dist, [0, 100], [0, 100]))
-            cv2.rectangle(overlay, (35, 165), (35 + bar_w, 175), self.secondary_color, -1)
-            
-            # Cursor Coord Display
-            cv2.putText(overlay, f"X:{analytics['screen_pos'][0]} Y:{analytics['screen_pos'][1]}", (145, 173), self.font, 0.4, (200, 200, 200), 1)
+            # Distance Gauge with Color transition
+            cv2.rectangle(overlay, (40, 175), (200, 185), (50, 50, 50), -1)
+            bar_w = int(np.interp(p_dist, [0, 120], [0, 160]))
+            cv2.rectangle(overlay, (40, 175), (40 + bar_w, 185), glow_color, -1)
+            cv2.putText(overlay, f"P-DISTANCE: {p_dist}", (40, 170), self.font, 0.4, (200, 200, 200), 1)
 
-        # 4. Professional Face Analysis (Minimalist)
-        if face_landmarks:
-            for face in face_landmarks:
-                for id in [33, 133, 362, 263, 1, 61, 291]: # Focus points only
-                    cv2.circle(overlay, (face[id][1], face[id][2]), 1, self.primary_color, -1)
+        # 4. Animated Scanning Grid (Aesthetic)
+        grid_y = int((t * 200) % h)
+        cv2.line(overlay, (0, grid_y), (w, grid_y), (glow_color[0]//4, glow_color[1]//4, glow_color[2]//4), 1)
 
-        # 5. Interaction Visuals
+        # 5. Targeting Reticle
         if landmarks:
-            # Cursor
             cursor_pos = analytics['screen_pos'] if analytics else (landmarks[8][1], landmarks[8][2])
-            cv2.circle(overlay, cursor_pos, 12, self.secondary_color, 1)
-            cv2.line(overlay, (cursor_pos[0]-15, cursor_pos[1]), (cursor_pos[0]+15, cursor_pos[1]), self.secondary_color, 1)
-            cv2.line(overlay, (cursor_pos[0], cursor_pos[1]-15), (cursor_pos[0], cursor_pos[1]+15), self.secondary_color, 1)
+            # Animated Reticle
+            r = 15 + int(np.sin(t * 10) * 5)
+            cv2.circle(overlay, cursor_pos, r, glow_color, 2)
+            cv2.drawMarker(overlay, cursor_pos, glow_color, cv2.MARKER_CROSS, 25, 1)
             
             if gesture == "Pinch":
-                cv2.circle(overlay, cursor_pos, 20, self.accent_color, 2)
-                cv2.putText(overlay, "INPUT TRIGGERED", (cursor_pos[0] + 25, cursor_pos[1]), self.font, 0.5, self.accent_color, 1)
+                cv2.putText(overlay, "INTERFACE TRIGGER", (cursor_pos[0] + 30, cursor_pos[1]), self.font, 0.6, self.accent_color, 2)
+
+        # Composite
+        cv2.addWeighted(overlay, 0.8, img, 0.2, 0, img)
+        return img
 
         # Final Compositing
         alpha = 0.8
